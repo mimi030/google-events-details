@@ -31,7 +31,7 @@
     <script defer>
         async function fetchEvents() {
             try {
-                const res = await fetch('https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?gid=0&single=true&output=csv');
+                const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTocjnryuBJ6Oz-KJeD5LLJsDfqrxiFccz4o15eNpxkyC_sGRbk5qgs8rAA_YpMmI_LFETJ5GG5knxC/pub?gid=0&single=true&output=csv');
                 const text = await res.text();
                 const rows = parseCSV(text);
                 
@@ -59,62 +59,4 @@
 
         fetchEvents();
     </script>
-
-    <!-- <script defer>
-        
-        async function fetchEvents() {
-            const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTocjnryuBJ6Oz-KJeD5LLJsDfqrxiFccz4o15eNpxkyC_sGRbk5qgs8rAA_YpMmI_LFETJ5GG5knxC/pub?gid=0&single=true&output=csv');
-            const text = await res.text();
-            const rows = text.split('\n').map(r => r.split(','));
-
-            // Assume first row = headers
-            const [headers, ...data] = rows;
-
-            let html = '<ul>';
-            data.forEach(row => {
-                html += `<li><strong>${row[0]}</strong> - ${row[1]} at ${row[2]}</li>`;
-            });
-            html += '</ul>';
-
-            document.getElementById('past-event-list').innerHTML = html;
-        }
-        fetchEvents();
-        /**/
-       
-        /*
-        async function fetchEvents() {
-            try {
-                // Replace with your deployed Apps Script Web App URL
-                const url = "https://script.google.com/macros/s/AKfycbwAUB5dhxufA1Ly_C4xvHoPv-3ZmF6V928zr-zPhpMsodB7grmLknou33qYgoKLcA0j/exec"; 
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("Network response was not ok");
-
-                const events = await res.json();
-
-                if (!Array.isArray(events) || events.length === 0) {
-                document.getElementById("events").innerHTML = "No events found.";
-                return;
-                }
-
-                let html = "";
-                events.forEach(ev => {
-                html += `
-                    <div class="event">
-                    <strong>${ev["Event Name"] || "Untitled Event"}</strong>
-                    📅 ${ev["Date"] || "TBA"}<br/>
-                    📍 ${ev["Location"] || "TBA"}
-                    </div>
-                `;
-                });
-
-                document.getElementById("events").innerHTML = html;
-            } catch (err) {
-                document.getElementById("events").innerHTML = "Error loading events.";
-                console.error(err);
-            }
-        }
-
-        fetchEvents();
-        */
-    </script> -->
 </html>
