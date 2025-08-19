@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetch Luma Past Events</title>
+    <title>Testing for showing google sheet</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         #events { margin-top: 20px; }
@@ -19,41 +19,77 @@
 </head>
 <body>
     <header>
-        <h1>Fetch Luma Past Events</h1>
+        <h1>Testing for Showing Google Sheet Events Details</h1>
     </header>
     
     <div id="past-event-list">Loading events...</div>
 
     <footer>
-        <p>&copy; 2025 MLTO Events</p>
+        <p>&copy; 2025 Test Events</p>
     </footer>
     
     <script defer>
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            return lines.map(line => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let char of line) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            });
+        }
+
         async function fetchEvents() {
             try {
+                console.log('Fetching events...');
                 const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTocjnryuBJ6Oz-KJeD5LLJsDfqrxiFccz4o15eNpxkyC_sGRbk5qgs8rAA_YpMmI_LFETJ5GG5knxC/pub?gid=0&single=true&output=csv');
+                
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                
                 const text = await res.text();
+                console.log('CSV data:', text);
+                
                 const rows = parseCSV(text);
+                console.log('Parsed rows:', rows);
                 
                 const [headers, ...data] = rows;
                 
                 let html = '';
-                data.forEach(row => {
-                    if (row[0]?.trim()) {
+                data.forEach((row, index) => {
+                    console.log(`Row ${index}:`, row);
+                    if (row[0] && row[0].trim()) {
                         html += `
                             <div class="event">
                                 <strong>${row[0]}</strong>
-                                📅 ${row[1]}<br/>
-                                📍 ${row[2]}<br/>
-                                <a href="${row[4]}" target="_blank">View Event</a>
+                                📅 ${row[1] || 'TBA'}<br/>
+                                📍 ${row[2] || 'TBA'}<br/>
+                                ${row[4] ? `<a href="${row[4]}" target="_blank">View Event</a>` : ''}
                             </div>
                         `;
                     }
                 });
                 
-                document.getElementById('past-event-list').innerHTML = html;
+                if (html) {
+                    document.getElementById('past-event-list').innerHTML = html;
+                } else {
+                    document.getElementById('past-event-list').innerHTML = 'No events found.';
+                }
+                
             } catch (err) {
-                document.getElementById('past-event-list').innerHTML = 'Error loading events.';
+                console.error('Error:', err);
+                document.getElementById('past-event-list').innerHTML = 'Error loading events: ' + err.message;
             }
         }
 
